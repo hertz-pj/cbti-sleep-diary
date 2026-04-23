@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的睡眠日记 · CBT-I</title>
+<link rel="stylesheet" href="/style.css?v=3">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+  <header class="topbar">
+    <h1>CBT-I 睡眠日记</h1>
+    <div class="user">
+      <span>欢迎，<b id="usernameLabel">…</b></span>
+      <button id="btnExport" type="button">导出 JSON</button>
+      <button id="btnLogout" type="button">退出登录</button>
+    </div>
+  </header>
+
+  <!-- 一周 7 列日记表 -->
+  <section class="card">
+    <div class="card-head">
+      <h2>本周睡眠日记 <small id="weekLabel"></small></h2>
+      <div class="range-bar">
+        <label style="font-size:13px;color:var(--ink-soft);">起始日期：</label>
+        <input id="weekStart" type="date" style="border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;">
+        <button id="prevWeek" type="button">← 上一周</button>
+        <button id="nextWeek" type="button">下一周 →</button>
+        <span class="save-status" id="saveStatus"></span>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="diary" id="diaryTable">
+        <thead>
+          <tr>
+            <th class="row-label-head">项目</th>
+            <!-- 7 day columns injected by JS -->
+          </tr>
+        </thead>
+        <tbody><!-- rows injected by JS --></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 本周汇总（自动） -->
+  <section class="card">
+    <div class="card-head"><h2>本周汇总 <small>平均值（自动计算）</small></h2></div>
+    <div class="card-body">
+      <div class="metrics" id="weekSummary">
+        <div class="metric"><div class="label">记录天数</div><div class="value" data-k="count">—</div></div>
+        <div class="metric"><div class="label">平均 TIB 在床时间</div><div class="value" data-k="avgTib">—</div></div>
+        <div class="metric accent"><div class="label">平均 TST 总睡眠</div><div class="value" data-k="avgTst">—</div></div>
+        <div class="metric"><div class="label">平均 SE 睡眠效率</div><div class="value" data-k="avgSe">—</div></div>
+        <div class="metric"><div class="label">平均 SOL 入睡潜伏</div><div class="value" data-k="avgSol">—</div></div>
+        <div class="metric"><div class="label">平均 WASO 夜醒</div><div class="value" data-k="avgWaso">—</div></div>
+        <div class="metric"><div class="label">平均夜醒次数</div><div class="value" data-k="avgAwk">—</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 趋势图表 -->
+  <section class="card">
+    <div class="card-head">
+      <h2>趋势可视化 <small>跨周对比</small></h2>
+      <div class="range-bar" id="rangeBar">
+        <button data-days="7"  type="button">7 天</button>
+        <button data-days="14" class="active" type="button">14 天</button>
+        <button data-days="30" type="button">30 天</button>
+        <button data-days="90" type="button">90 天</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="chart-grid">
+        <div class="chart-box full">
+          <h3>每日睡眠效率 SE（%） · 目标 ≥ 85%</h3>
+          <div class="canvas-wrap"><canvas id="chartSE"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <h3>每日总睡眠时间 TST（小时）</h3>
+          <div class="canvas-wrap"><canvas id="chartTST"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <h3>每日 SOL / WASO（分钟）</h3>
+          <div class="canvas-wrap"><canvas id="chartSolWaso"></canvas></div>
+        </div>
+        <div class="chart-box full">
+          <h3>每周平均：TIB 与 TST（小时） · 灰色阴影 = 醒着的在床时间</h3>
+          <div class="canvas-wrap"><canvas id="chartWeekly"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="note">
+    本工具仅用于自助记录与心理治疗师辅助参考，不构成医学诊断。<br>
+    数据保存在你的服务器上，每位用户拥有独立的 JSON 文件。
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/app.js?v=3"></script>
+</body>
+</html>

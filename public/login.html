@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 · CBT-I 睡眠日记</title>
+<link rel="stylesheet" href="/style.css?v=3">
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <h1>CBT-I 睡眠日记</h1>
+    <p class="subtitle">基于认知行为疗法的睡眠记录与可视化</p>
+
+    <div class="auth-tabs">
+      <button id="tabLogin" class="active" type="button">登录</button>
+      <button id="tabRegister" type="button">注册</button>
+    </div>
+
+    <div id="msg" class="auth-msg"></div>
+
+    <form id="authForm" class="auth-form" autocomplete="off">
+      <div class="field">
+        <label for="username">用户名 <small>3-32 位字母 / 数字 / _ / -</small></label>
+        <input id="username" name="username" type="text" autocomplete="username"
+               minlength="3" maxlength="32" pattern="[a-zA-Z0-9_\-]{3,32}" required>
+      </div>
+      <div class="field">
+        <label for="password">密码 <small>至少 6 位</small></label>
+        <input id="password" name="password" type="password" autocomplete="current-password"
+               minlength="6" maxlength="128" required>
+      </div>
+      <button type="submit" class="primary" id="submitBtn">登 录</button>
+    </form>
+
+    <footer class="note">数据保存在你部署的服务器上，每位用户一个独立的 JSON 文件。</footer>
+  </div>
+
+  <script src="/login.js?v=3"></script>
+</body>
+</html>

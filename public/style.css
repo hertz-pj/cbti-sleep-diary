@@ -1,0 +1,335 @@
+:root {
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --ink: #1f2937;
+  --ink-soft: #4b5563;
+  --muted: #9ca3af;
+  --line: #e5e7eb;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --good: #10b981;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+  --row-alt: #fafbff;
+  --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+               "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* ---------- 顶部条 ---------- */
+header.topbar {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+header.topbar h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: .5px; }
+header.topbar .user { font-size: 13px; opacity: .9; display: flex; gap: 12px; align-items: center; }
+header.topbar .user button {
+  background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.3);
+  border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer;
+}
+header.topbar .user button:hover { background: rgba(255,255,255,.28); }
+
+/* ---------- 卡片 ---------- */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--line); background: #fcfcfd;
+}
+.card-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.card-head h2 small { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 12px; }
+.card-body { padding: 18px; }
+
+/* ---------- 通用按钮 ---------- */
+button, .btn {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+button:hover, .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+button.primary, .btn.primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+button.primary:hover, .btn.primary:hover { background: #4338ca; color: #fff; }
+button.danger:hover { border-color: var(--bad); color: var(--bad); background: #fef2f2; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ---------- 录入表单 ---------- */
+.entry-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
+.field label small { color: var(--muted); font-weight: 400; margin-left: 4px; }
+.field input, .field select, .field textarea {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+}
+.field textarea { resize: vertical; min-height: 60px; }
+
+.entry-actions {
+  margin-top: 16px;
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+}
+.entry-actions .save-status { font-size: 12px; color: var(--muted); margin-left: 6px; }
+
+/* ---------- 计算指标卡 ---------- */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+.metric {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.metric .label { font-size: 11px; color: var(--muted); letter-spacing: .5px; }
+.metric .value { font-size: 22px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+.metric .value small { font-size: 12px; color: var(--muted); font-weight: 500; margin-left: 2px; }
+.metric.good  .value { color: var(--good); }
+.metric.warn  .value { color: var(--warn); }
+.metric.bad   .value { color: var(--bad); }
+.metric.accent .value { color: var(--accent); }
+
+/* ---------- 时间范围选择 ---------- */
+.range-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  font-size: 13px;
+}
+.range-bar button.active {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+
+/* ---------- 图表容器 ---------- */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+@media (min-width: 900px) {
+  .chart-grid { grid-template-columns: 1fr 1fr; }
+  .chart-grid .full { grid-column: 1 / -1; }
+}
+.chart-box {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  position: relative;
+}
+.chart-box h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.chart-box .canvas-wrap { position: relative; height: 240px; }
+.chart-box.full .canvas-wrap { height: 280px; }
+
+/* ---------- 一周 7 列日记表 ---------- */
+.table-wrap { overflow-x: auto; }
+table.diary {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+  font-size: 13px;
+}
+table.diary th, table.diary td {
+  border: 1px solid var(--line);
+  padding: 0;
+  vertical-align: middle;
+  text-align: center;
+}
+table.diary thead th {
+  background: #f9fafb;
+  padding: 10px 8px;
+  font-weight: 600;
+  color: var(--ink);
+  position: sticky; top: 0; z-index: 1;
+}
+table.diary thead th.day-col { min-width: 110px; }
+table.diary thead th.day-col .weekday {
+  display: block;
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 2px;
+}
+table.diary thead th.row-label-head {
+  text-align: left; padding-left: 12px; min-width: 200px;
+  background: #f9fafb;
+  position: sticky; left: 0; z-index: 2;
+}
+table.diary td.field-label {
+  background: #fcfcfd;
+  text-align: left;
+  padding: 8px 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  position: sticky; left: 0; z-index: 1;
+}
+table.diary td.field-label small {
+  display: block;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+}
+table.diary tbody tr:nth-child(even) td:not(.field-label):not(.computed) {
+  background: var(--row-alt);
+}
+table.diary tbody tr.section-sep td {
+  background: var(--accent-soft) !important;
+  color: var(--accent);
+  text-align: left;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  position: sticky; left: 0; z-index: 1;
+}
+table.diary input, table.diary select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 8px 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--ink);
+  text-align: center;
+  outline: none;
+}
+table.diary input:focus, table.diary select:focus {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+table.diary td.computed {
+  background: #f0fdf4 !important;
+  font-weight: 600;
+  color: #065f46;
+  font-size: 13px;
+}
+table.diary td.computed.warn { background: #fffbeb !important; color: #92400e; }
+table.diary td.computed.bad  { background: #fef2f2 !important; color: #991b1b; }
+
+/* ---------- 历史表格 ---------- */
+.history-wrap { overflow-x: auto; }
+table.history {
+  width: 100%; border-collapse: collapse; min-width: 720px; font-size: 13px;
+}
+table.history th, table.history td {
+  border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: center;
+}
+table.history th { background: #f9fafb; font-weight: 600; color: var(--ink-soft); font-size: 12px; }
+table.history td.left { text-align: left; }
+table.history tbody tr:hover { background: var(--row-alt); }
+table.history .se-good { color: var(--good); font-weight: 600; }
+table.history .se-warn { color: var(--warn); font-weight: 600; }
+table.history .se-bad  { color: var(--bad);  font-weight: 600; }
+table.history .row-actions button { padding: 3px 10px; font-size: 12px; }
+
+/* ---------- 登录页 ---------- */
+.auth-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 100%);
+  padding: 20px;
+}
+.auth-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(79,70,229,.18);
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 400px;
+}
+.auth-card h1 {
+  margin: 0 0 4px; font-size: 22px; color: var(--ink); text-align: center;
+}
+.auth-card .subtitle {
+  margin: 0 0 24px; font-size: 13px; color: var(--muted); text-align: center;
+}
+.auth-tabs {
+  display: flex;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.auth-tabs button {
+  flex: 1; background: transparent; border: none; padding: 8px;
+  border-radius: 6px; font-size: 13px; color: var(--ink-soft);
+}
+.auth-tabs button.active {
+  background: #fff; color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+.auth-form .field { margin-bottom: 14px; }
+.auth-form button[type="submit"] {
+  width: 100%; padding: 11px; font-size: 14px; font-weight: 600; margin-top: 6px;
+}
+.auth-msg {
+  font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 14px;
+  display: none;
+}
+.auth-msg.error   { display: block; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+.auth-msg.success { display: block; background: #f0fdf4; color: #065f46; border: 1px solid #bbf7d0; }
+
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--ink); color: #fff;
+  padding: 10px 16px; border-radius: 8px; font-size: 13px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .2s, transform .2s;
+  pointer-events: none;
+  z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { background: var(--bad); }
+.toast.success { background: var(--good); }
+
+footer.note {
+  margin-top: 20px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.7;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "cbti-sleep-diary",
+  "version": "1.0.0",
+  "description": "CBT-I Sleep Diary · A multi-user web app for cognitive behavioral therapy of insomnia (Node.js + Express + JSON file storage). 基于认知行为疗法的多用户睡眠日记 Web 应用。",
+  "keywords": ["cbt-i", "sleep-diary", "insomnia", "cbt", "sleep-tracker", "express", "self-hosted"],
+  "license": "MIT",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

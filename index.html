@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT-I 睡眠日记 · Sleep Diary</title>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --panel: #ffffff;
+    --ink: #1f2937;
+    --ink-soft: #4b5563;
+    --muted: #9ca3af;
+    --line: #e5e7eb;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --good: #10b981;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+    --row-alt: #fafbff;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  header.hero {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+  header.hero h1 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    letter-spacing: .5px;
+    font-weight: 700;
+  }
+  header.hero p {
+    margin: 0;
+    opacity: .9;
+    font-size: 14px;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .toolbar .left, .toolbar .right { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .toolbar label { font-size: 13px; color: var(--ink-soft); }
+  .toolbar input[type="date"] {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--ink);
+    background: #fff;
+  }
+  button {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  button.primary {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+  button.primary:hover { background: #4338ca; color: #fff; }
+  button.danger:hover { border-color: var(--bad); color: var(--bad); background: #fef2f2; }
+
+  .save-indicator {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+
+  details.instructions {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  details.instructions summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ink);
+    list-style: none;
+  }
+  details.instructions summary::-webkit-details-marker { display: none; }
+  details.instructions summary::before {
+    content: "▸";
+    display: inline-block;
+    margin-right: 8px;
+    transition: transform .2s ease;
+    color: var(--accent);
+  }
+  details.instructions[open] summary::before { transform: rotate(90deg); }
+  .instructions ul { margin: 10px 0 0; padding-left: 22px; color: var(--ink-soft); font-size: 14px; }
+  .instructions li { margin-bottom: 4px; }
+  .instructions .legend {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line);
+    font-size: 13px; color: var(--ink-soft);
+  }
+  .instructions .legend b { color: var(--ink); }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+
+  .table-wrap { overflow-x: auto; }
+  table.diary {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+    font-size: 13px;
+  }
+  table.diary th, table.diary td {
+    border: 1px solid var(--line);
+    padding: 0;
+    vertical-align: middle;
+    text-align: center;
+  }
+  table.diary thead th {
+    background: #f9fafb;
+    padding: 10px 8px;
+    font-weight: 600;
+    color: var(--ink);
+    position: sticky; top: 0;
+    z-index: 1;
+  }
+  table.diary thead th.day-col { min-width: 120px; }
+  table.diary thead th.day-col .weekday {
+    display: block;
+    font-weight: 500;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  table.diary td.field-label {
+    background: #fcfcfd;
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    position: sticky; left: 0; z-index: 1;
+  }
+  table.diary td.field-label small {
+    display: block;
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 11px;
+  }
+  table.diary tbody tr:nth-child(even) td:not(.field-label) {
+    background: var(--row-alt);
+  }
+  table.diary tbody tr.section-sep td {
+    background: #eef2ff !important;
+    color: var(--accent);
+    text-align: left;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .5px;
+  }
+  table.diary input, table.diary select, table.diary textarea {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 8px 6px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--ink);
+    text-align: center;
+    outline: none;
+  }
+  table.diary input:focus, table.diary select:focus, table.diary textarea:focus {
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+  table.diary textarea { resize: vertical; min-height: 36px; text-align: left; padding: 6px 8px; }
+  table.diary td.computed {
+    background: #f0fdf4 !important;
+    font-weight: 600;
+    color: #065f46;
+  }
+  table.diary td.computed.warn { background: #fffbeb !important; color: #92400e; }
+  table.diary td.computed.bad  { background: #fef2f2 !important; color: #991b1b; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    padding: 18px;
+  }
+  .stat {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stat .label { font-size: 12px; color: var(--muted); letter-spacing: .5px; }
+  .stat .value { font-size: 24px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+  .stat .value small { font-size: 13px; color: var(--muted); font-weight: 500; margin-left: 2px; }
+  .stat.accent .value { color: var(--accent); }
+  .stat.good   .value { color: var(--good); }
+  .stat.warn   .value { color: var(--warn); }
+  .stat.bad    .value { color: var(--bad); }
+
+  .section-title {
+    margin: 0;
+    padding: 14px 18px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .section-title small { color: var(--muted); font-weight: 400; margin-left: 6px; }
+
+  footer.note {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar, details.instructions, footer.note, button { display: none !important; }
+    header.hero { background: none; color: var(--ink); box-shadow: none; padding: 0 0 12px; }
+    header.hero h1 { color: var(--ink); }
+    .card, .summary-grid .stat { box-shadow: none; }
+    table.diary { font-size: 11px; min-width: 0; }
+    table.diary thead th.day-col { min-width: 80px; }
+    .container { padding: 16px; max-width: none; }
+    @page { size: A4 landscape; margin: 12mm; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <h1>CBT-I 睡眠日记 · Weekly Sleep Diary</h1>
+    <p>基于 Consensus Sleep Diary (Carney et al., 2012) · 每天起床后 5–10 分钟内填写 · 连续记录至少 1–2 周</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="left">
+      <label for="weekStart">起始日期：</label>
+      <input type="date" id="weekStart">
+      <button id="prevWeek">← 上一周</button>
+      <button id="nextWeek">下一周 →</button>
+      <span class="save-indicator" id="saveIndicator">已自动保存</span>
+    </div>
+    <div class="right">
+      <button id="btnPrint" class="primary">打印 / 导出 PDF</button>
+      <button id="btnCopyFeishu">复制到飞书</button>
+      <button id="btnExport">导出 CSV</button>
+      <button id="btnClear" class="danger">清空本周</button>
+    </div>
+  </div>
+
+  <details class="instructions">
+    <summary>填写说明与关键指标解释（点击展开）</summary>
+    <ul>
+      <li><b>每天早晨起床后尽快填写</b>前一晚的睡眠情况，不要在晚上补记，也不要频繁看时钟——所有时间都是「估计值」即可。</li>
+      <li>时间格式为 24 小时制（例如 23:30、06:45）。如果跨过午夜，系统会自动处理。</li>
+      <li>填写后 <b>TST / TIB / SE</b> 三项会自动计算，用于制定 CBT-I 的「睡眠限制」与「刺激控制」方案。</li>
+      <li>所有数据保存在你当前浏览器本地（localStorage），不会上传到任何服务器。</li>
+    </ul>
+    <div class="legend">
+      <span><b>TIB</b> 在床时间 = 起床时间 − 上床时间</span>
+      <span><b>TST</b> 总睡眠时间 = TIB − 入睡潜伏 − 夜醒总时长 − 晨醒后赖床</span>
+      <span><b>SE</b> 睡眠效率 = TST ÷ TIB × 100%（目标 ≥ 85%）</span>
+      <span><b>SOL</b> 入睡潜伏期（分钟）</span>
+      <span><b>WASO</b> 夜间清醒时长（分钟）</span>
+    </div>
+  </details>
+
+  <div class="card">
+    <h3 class="section-title">本周睡眠日记 <small id="weekLabel"></small></h3>
+    <div class="table-wrap">
+      <table class="diary" id="diaryTable">
+        <thead>
+          <tr>
+            <th style="min-width: 220px; text-align:left; padding-left:12px;">项目</th>
+            <!-- 7 day columns injected by JS -->
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">本周汇总 <small>平均值（自动计算）</small></h3>
+    <div class="summary-grid" id="summaryGrid">
+      <!-- stats injected by JS -->
+    </div>
+  </div>
+
+  <footer class="note">
+    本工具仅用于自助记录与心理治疗师辅助参考，不构成医学诊断。<br>
+    如失眠严重或伴随情绪问题，请咨询精神科医师或持证心理治疗师。
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   CBT-I 睡眠日记 · 核心逻辑
+   ============================================================ */
+
+const FIELDS = [
+  { type: 'section', label: '一、白天情况（昨天）' },
+  { id: 'naps',        label: '白天小睡',         hint: '次数 / 总分钟',   input: 'text',   placeholder: '例：1次/30min' },
+  { id: 'caffeine',    label: '咖啡因摄入',        hint: '最后一次时间/量', input: 'text',   placeholder: '例：14:00 1杯' },
+  { id: 'alcohol',     label: '饮酒',             hint: '时间/量',         input: 'text',   placeholder: '例：21:00 1杯' },
+  { id: 'meds',        label: '助眠药/褪黑素',     hint: '名称/剂量/时间',  input: 'text',   placeholder: '例：无' },
+  { id: 'exercise',    label: '运动',             hint: '时间/强度',       input: 'text',   placeholder: '例：18:00 中等' },
+
+  { type: 'section', label: '二、夜间睡眠' },
+  { id: 'bedTime',     label: '上床时间',         hint: '躺到床上的时刻',  input: 'time' },
+  { id: 'lightsOut',   label: '关灯尝试入睡',     hint: '真正想睡的时刻',  input: 'time' },
+  { id: 'sol',         label: '入睡潜伏期 SOL',   hint: '花多少分钟才睡着',input: 'number', min: 0, max: 720, step: 5, suffix: '分钟' },
+  { id: 'awakenings',  label: '夜间醒来次数',      hint: '不含最终醒来',    input: 'number', min: 0, max: 30, step: 1, suffix: '次' },
+  { id: 'waso',        label: '夜醒总时长 WASO',  hint: '加起来共多少分钟',input: 'number', min: 0, max: 720, step: 5, suffix: '分钟' },
+  { id: 'finalWake',   label: '最终醒来时间',     hint: '最后一次醒不再睡',input: 'time' },
+  { id: 'outOfBed',    label: '起床离开床时间',   hint: '双脚离开床的时刻',input: 'time' },
+
+  { type: 'section', label: '三、自动计算' },
+  { id: 'tib',  label: 'TIB 在床时间',  hint: '小时', computed: true },
+  { id: 'tst',  label: 'TST 总睡眠时间', hint: '小时', computed: true },
+  { id: 'se',   label: 'SE 睡眠效率',    hint: '目标 ≥ 85%', computed: true },
+
+  { type: 'section', label: '四、主观评价' },
+  { id: 'quality',  label: '睡眠质量',     hint: '1 很差 — 5 很好', input: 'select', options: ['','1','2','3','4','5'] },
+  { id: 'refresh',  label: '醒来精神状态', hint: '1 很累 — 5 精神', input: 'select', options: ['','1','2','3','4','5'] },
+  { id: 'daytime',  label: '白天状态/精力',hint: '1 很差 — 5 很好', input: 'select', options: ['','1','2','3','4','5'] },
+  { id: 'mood',     label: '情绪',        hint: '1 低落 — 5 愉快', input: 'select', options: ['','1','2','3','4','5'] },
+  { id: 'notes',    label: '备注 / 想法',  hint: '压力源、梦境、就寝前思维等', input: 'textarea' },
+];
+
+// index 0..6 -> 周日..周六（与 Date.getDay() 一致）
+const DAYS_CN = ['周日','周一','周二','周三','周四','周五','周六'];
+const STORAGE_KEY = 'cbti_sleep_diary_v1';
+const DEFAULT_START = '2026-04-23'; // 用户指定的默认起始日
+
+let state = loadState();
+let currentWeekStart = parseYMD(DEFAULT_START);
+
+/* ---------- 日期工具 ---------- */
+function pad(n) { return String(n).padStart(2, '0'); }
+function ymd(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function parseYMD(s) {
+  const [y, m, d] = s.split('-').map(Number);
+  const x = new Date(y, m - 1, d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function fmtMonthDay(d) { return `${d.getMonth()+1}月${d.getDate()}日`; }
+function weekdayCN(d) { return DAYS_CN[d.getDay()]; }
+
+/* ---------- 存取 ---------- */
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  flashSaved();
+}
+let saveTimer = null;
+function flashSaved() {
+  const el = document.getElementById('saveIndicator');
+  el.textContent = '已保存 ✓';
+  el.style.color = 'var(--good)';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    el.textContent = '已自动保存';
+    el.style.color = 'var(--muted)';
+  }, 1500);
+}
+
+/* ---------- 计算：时间差（分钟），支持跨日 ---------- */
+function diffMinutes(startHHMM, endHHMM) {
+  if (!startHHMM || !endHHMM) return null;
+  const [sh, sm] = startHHMM.split(':').map(Number);
+  const [eh, em] = endHHMM.split(':').map(Number);
+  let start = sh * 60 + sm;
+  let end   = eh * 60 + em;
+  if (end <= start) end += 24 * 60; // 跨越午夜
+  return end - start;
+}
+function minutesToHHMM(min) {
+  if (min == null || isNaN(min)) return '—';
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return `${h}小时${m > 0 ? m + '分' : ''}`;
+}
+
+/* ---------- 渲染表格 ---------- */
+function renderTable() {
+  const table = document.getElementById('diaryTable');
+  const thead = table.querySelector('thead tr');
+  const tbody = table.querySelector('tbody');
+
+  // 清空（保留第一列 th）
+  while (thead.children.length > 1) thead.removeChild(thead.lastChild);
+  tbody.innerHTML = '';
+
+  // 头部 7 天
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const th = document.createElement('th');
+    th.className = 'day-col';
+    th.innerHTML = `${fmtMonthDay(d)}<span class="weekday">${weekdayCN(d)}</span>`;
+    thead.appendChild(th);
+  }
+
+  // 主体
+  FIELDS.forEach(f => {
+    const tr = document.createElement('tr');
+    if (f.type === 'section') {
+      tr.className = 'section-sep';
+      const td = document.createElement('td');
+      td.colSpan = 8;
+      td.textContent = f.label;
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    const labelTd = document.createElement('td');
+    labelTd.className = 'field-label';
+    labelTd.innerHTML = `${f.label}${f.hint ? `<small>${f.hint}</small>` : ''}`;
+    tr.appendChild(labelTd);
+
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(currentWeekStart, i);
+      const dateKey = ymd(d);
+      const td = document.createElement('td');
+      td.dataset.date = dateKey;
+      td.dataset.field = f.id;
+
+      if (f.computed) {
+        td.classList.add('computed');
+        td.textContent = '—';
+      } else {
+        const val = (state[dateKey] && state[dateKey][f.id]) || '';
+        let el;
+        if (f.input === 'select') {
+          el = document.createElement('select');
+          f.options.forEach(opt => {
+            const o = document.createElement('option');
+            o.value = opt;
+            o.textContent = opt === '' ? '—' : opt;
+            if (opt === val) o.selected = true;
+            el.appendChild(o);
+          });
+        } else if (f.input === 'textarea') {
+          el = document.createElement('textarea');
+          el.rows = 2;
+          el.value = val;
+          el.placeholder = f.placeholder || '';
+        } else {
+          el = document.createElement('input');
+          el.type = f.input || 'text';
+          el.value = val;
+          if (f.placeholder) el.placeholder = f.placeholder;
+          if (f.min != null) el.min = f.min;
+          if (f.max != null) el.max = f.max;
+          if (f.step != null) el.step = f.step;
+        }
+        el.addEventListener('input', () => handleInput(dateKey, f.id, el.value));
+        el.addEventListener('change', () => handleInput(dateKey, f.id, el.value));
+        td.appendChild(el);
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  });
+
+  // 更新顶部范围标签
+  const endD = addDays(currentWeekStart, 6);
+  document.getElementById('weekLabel').textContent =
+    `${fmtMonthDay(currentWeekStart)} – ${fmtMonthDay(endD)}`;
+  document.getElementById('weekStart').value = ymd(currentWeekStart);
+
+  recomputeAll();
+}
+
+function handleInput(dateKey, fieldId, value) {
+  if (!state[dateKey]) state[dateKey] = {};
+  state[dateKey][fieldId] = value;
+  saveState();
+  recomputeAll();
+}
+
+/* ---------- 计算 TIB / TST / SE 并渲染 ---------- */
+function computeDay(dateKey) {
+  const d = state[dateKey] || {};
+  const tibMin = diffMinutes(d.bedTime, d.outOfBed);
+  const sol    = parseFloat(d.sol) || 0;
+  const waso   = parseFloat(d.waso) || 0;
+  let earlyWakeMin = 0;
+  if (d.finalWake && d.outOfBed) {
+    const e = diffMinutes(d.finalWake, d.outOfBed);
+    if (e != null) earlyWakeMin = e;
+  }
+  let tstMin = null;
+  if (tibMin != null) {
+    tstMin = Math.max(0, tibMin - sol - waso - earlyWakeMin);
+  }
+  const se = (tibMin && tstMin != null) ? (tstMin / tibMin * 100) : null;
+  return { tibMin, tstMin, se };
+}
+
+function recomputeAll() {
+  let sumTib = 0, sumTst = 0, sumSe = 0, sumSol = 0, sumWaso = 0, sumQual = 0;
+  let nTib = 0, nTst = 0, nSe = 0, nSol = 0, nWaso = 0, nQual = 0;
+
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const key = ymd(d);
+    const { tibMin, tstMin, se } = computeDay(key);
+
+    setComputed(key, 'tib', tibMin != null ? minutesToHHMM(tibMin) : '—');
+    setComputed(key, 'tst', tstMin != null ? minutesToHHMM(tstMin) : '—');
+
+    const seCell = document.querySelector(`td[data-date="${key}"][data-field="se"]`);
+    if (seCell) {
+      if (se == null) { seCell.textContent = '—'; seCell.className = 'computed'; }
+      else {
+        seCell.textContent = se.toFixed(0) + '%';
+        seCell.className = 'computed ' + (se >= 85 ? '' : se >= 75 ? 'warn' : 'bad');
+      }
+    }
+
+    if (tibMin != null) { sumTib += tibMin; nTib++; }
+    if (tstMin != null) { sumTst += tstMin; nTst++; }
+    if (se   != null)   { sumSe  += se;     nSe++;  }
+    const rec = state[key] || {};
+    if (rec.sol !== undefined && rec.sol !== '')  { sumSol  += parseFloat(rec.sol)  || 0; nSol++; }
+    if (rec.waso !== undefined && rec.waso !== ''){ sumWaso += parseFloat(rec.waso) || 0; nWaso++; }
+    if (rec.quality)                               { sumQual += parseFloat(rec.quality) || 0; nQual++; }
+  }
+
+  const avgSe  = nSe  ? sumSe  / nSe  : null;
+  renderSummary([
+    { label: '记录天数', value: nTib + '/7', tone: 'accent' },
+    { label: '平均在床时间 TIB', value: nTib ? minutesToHHMM(sumTib / nTib) : '—' },
+    { label: '平均总睡眠 TST',   value: nTst ? minutesToHHMM(sumTst / nTst) : '—', tone: 'accent' },
+    { label: '平均睡眠效率 SE',  value: avgSe != null ? avgSe.toFixed(0) + '%' : '—',
+      tone: avgSe == null ? '' : avgSe >= 85 ? 'good' : avgSe >= 75 ? 'warn' : 'bad' },
+    { label: '平均入睡潜伏 SOL', value: nSol  ? Math.round(sumSol / nSol)  + ' 分钟' : '—' },
+    { label: '平均夜醒 WASO',    value: nWaso ? Math.round(sumWaso / nWaso) + ' 分钟' : '—' },
+    { label: '平均主观质量',     value: nQual ? (sumQual / nQual).toFixed(1) + ' / 5' : '—' },
+  ]);
+}
+
+function setComputed(dateKey, fieldId, text) {
+  const cell = document.querySelector(`td[data-date="${dateKey}"][data-field="${fieldId}"]`);
+  if (cell) cell.textContent = text;
+}
+
+function renderSummary(items) {
+  const grid = document.getElementById('summaryGrid');
+  grid.innerHTML = items.map(it => `
+    <div class="stat ${it.tone || ''}">
+      <div class="label">${it.label}</div>
+      <div class="value">${it.value}</div>
+    </div>
+  `).join('');
+}
+
+/* ---------- 操作：上一周 / 下一周 / 打印 / 导出 / 清空 ---------- */
+document.getElementById('prevWeek').addEventListener('click', () => {
+  currentWeekStart = addDays(currentWeekStart, -7);
+  renderTable();
+});
+document.getElementById('nextWeek').addEventListener('click', () => {
+  currentWeekStart = addDays(currentWeekStart, 7);
+  renderTable();
+});
+document.getElementById('weekStart').addEventListener('change', (e) => {
+  if (!e.target.value) return;
+  currentWeekStart = parseYMD(e.target.value);
+  renderTable();
+});
+document.getElementById('btnPrint').addEventListener('click', () => window.print());
+document.getElementById('btnClear').addEventListener('click', () => {
+  if (!confirm('确定清空本周全部数据？此操作不可恢复。')) return;
+  for (let i = 0; i < 7; i++) delete state[ymd(addDays(currentWeekStart, i))];
+  saveState();
+  renderTable();
+});
+document.getElementById('btnExport').addEventListener('click', exportCSV);
+document.getElementById('btnCopyFeishu').addEventListener('click', copyForFeishu);
+
+function exportCSV() {
+  const headers = ['日期','星期', ...FIELDS.filter(f => f.type !== 'section').map(f => f.label)];
+  const rows = [headers];
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const key = ymd(d);
+    const rec = state[key] || {};
+    const { tibMin, tstMin, se } = computeDay(key);
+    const computedMap = {
+      tib: tibMin != null ? minutesToHHMM(tibMin) : '',
+      tst: tstMin != null ? minutesToHHMM(tstMin) : '',
+      se : se    != null ? se.toFixed(0) + '%'   : '',
+    };
+    const row = [key, weekdayCN(d)];
+    FIELDS.forEach(f => {
+      if (f.type === 'section') return;
+      if (f.computed) row.push(computedMap[f.id] || '');
+      else row.push(rec[f.id] || '');
+    });
+    rows.push(row);
+  }
+  const csv = rows.map(r => r.map(cell => {
+    const s = String(cell ?? '');
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sleep-diary_${ymd(currentWeekStart)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- 复制到飞书（同时写入 HTML + TSV） ---------- */
+function buildMatrix() {
+  // 行 = 字段 + 表头；列 = 项目 + 7 天，跟界面一致
+  const header = ['项目'];
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    header.push(`${fmtMonthDay(d)} ${weekdayCN(d)}`);
+  }
+  const matrix = [header];
+
+  FIELDS.forEach(f => {
+    if (f.type === 'section') {
+      const sep = [`【${f.label}】`];
+      for (let i = 0; i < 7; i++) sep.push('');
+      matrix.push(sep);
+      return;
+    }
+    const row = [f.hint ? `${f.label}（${f.hint}）` : f.label];
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(currentWeekStart, i);
+      const key = ymd(d);
+      const rec = state[key] || {};
+      if (f.computed) {
+        const { tibMin, tstMin, se } = computeDay(key);
+        if (f.id === 'tib') row.push(tibMin != null ? minutesToHHMM(tibMin) : '');
+        else if (f.id === 'tst') row.push(tstMin != null ? minutesToHHMM(tstMin) : '');
+        else if (f.id === 'se')  row.push(se   != null ? se.toFixed(0) + '%' : '');
+      } else {
+        row.push(rec[f.id] || '');
+      }
+    }
+    matrix.push(row);
+  });
+  return matrix;
+}
+
+async function copyForFeishu() {
+  const matrix = buildMatrix();
+
+  // TSV：粘到飞书电子表格 / 多维表格最稳
+  const tsv = matrix.map(r =>
+    r.map(c => String(c ?? '').replace(/\t/g, ' ').replace(/\r?\n/g, ' ')).join('\t')
+  ).join('\n');
+
+  // HTML：粘到飞书文档保留表格结构
+  const esc = s => String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const html =
+    '<table border="1" style="border-collapse:collapse">' +
+    matrix.map((r, i) =>
+      '<tr>' + r.map(c =>
+        i === 0
+          ? `<th style="background:#f3f4f6;padding:4px 8px">${esc(c)}</th>`
+          : `<td style="padding:4px 8px">${esc(c)}</td>`
+      ).join('') + '</tr>'
+    ).join('') + '</table>';
+
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html':  new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([tsv],  { type: 'text/plain' }),
+      })]);
+    } else {
+      await navigator.clipboard.writeText(tsv);
+    }
+    toast('已复制 ✓ 直接到飞书表格 / 文档里粘贴即可');
+  } catch (e) {
+    // 兜底：用 execCommand
+    const ta = document.createElement('textarea');
+    ta.value = tsv;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); toast('已复制 ✓ 直接粘贴到飞书'); }
+    catch { toast('复制失败，请改用「导出 CSV」'); }
+    ta.remove();
+  }
+}
+
+function toast(msg) {
+  const el = document.getElementById('saveIndicator');
+  el.textContent = msg;
+  el.style.color = 'var(--good)';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    el.textContent = '已自动保存';
+    el.style.color = 'var(--muted)';
+  }, 2500);
+}
+
+/* ---------- 启动 ---------- */
+renderTable();
+</script>
+</body>
+</html>
