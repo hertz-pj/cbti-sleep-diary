@@ -27,6 +27,9 @@ const DIARY_DIR = path.join(DATA_DIR, 'diaries');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const SECRET_FILE = path.join(DATA_DIR, '.jwt-secret');
 const ALLOW_REGISTER = (process.env.ALLOW_REGISTER || 'true').toLowerCase() === 'true';
+// Cookie 是否要求 HTTPS。默认 false，方便服务器还没接 HTTPS 时直接 IP+端口访问。
+// 接好 Nginx + 证书后，把 ecosystem.config.js 里 COOKIE_SECURE 设为 'true'。
+const COOKIE_SECURE = String(process.env.COOKIE_SECURE || '').toLowerCase() === 'true';
 
 // 持久化的 JWT 密钥：环境变量优先；否则首次启动随机生成并落盘到 data/.jwt-secret
 function loadOrCreateSecret() {
@@ -117,7 +120,7 @@ function setAuthCookie(res, username) {
   res.cookie('cbti_token', token, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production', // 生产 HTTPS 时启用
+    secure: COOKIE_SECURE, // 仅在显式开启 HTTPS 时设 true
     maxAge: 30 * 24 * 3600 * 1000,
     path: '/',
   });
@@ -320,5 +323,6 @@ app.listen(PORT, () => {
   console.log(`  访问地址:   http://localhost:${PORT}`);
   console.log(`  数据目录:   ${DATA_DIR}`);
   console.log(`  注册开放:   ${ALLOW_REGISTER ? '是' : '否'}`);
-  console.log(`  JWT_SECRET: ${process.env.JWT_SECRET ? '来自环境变量' : '本机持久化文件'}\n`);
+  console.log(`  JWT_SECRET: ${process.env.JWT_SECRET ? '来自环境变量' : '本机持久化文件'}`);
+  console.log(`  COOKIE_SECURE: ${COOKIE_SECURE} ${COOKIE_SECURE ? '（仅 HTTPS 可用）' : '（HTTP 可用）'}\n`);
 });

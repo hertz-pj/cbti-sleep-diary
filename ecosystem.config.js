@@ -18,6 +18,9 @@ module.exports = {
       // JWT_SECRET: '请改成你自己的长随机串',
       // ALLOW_REGISTER: 'false',  // 注册完所有人后可关闭
       // DATA_DIR: '/var/lib/cbti-data',
+      // 还没接 HTTPS 时保持注释掉（默认 false，HTTP 也能登录）
+      // 接好 Nginx + 证书后再打开下一行：
+      // COOKIE_SECURE: 'true',
     },
   }],
 };
